@@ -45,14 +45,14 @@ class AddressBook:
             return
 
         print("Editing contact:")
-        contact.first_name = input(f"First Name ({contact.first_name}): ") or contact.first_name
-        contact.last_name = input(f"Last Name ({contact.last_name}): ") or contact.last_name
-        contact.address = input(f"Address ({contact.address}): ") or contact.address
-        contact.city = input(f"City ({contact.city}): ") or contact.city
-        contact.state = input(f"State ({contact.state}): ") or contact.state
-        contact.zip_code = input(f"Zip Code ({contact.zip_code}): ") or contact.zip_code
-        contact.phone_number = input(f"Phone Number ({contact.phone_number}): ") or contact.phone_number
-        contact.email = input(f"Email ({contact.email}): ") or contact.email
+        contact.first_name = input(f"First Name({contact.first_name}): ") 
+        contact.last_name = input(f"Last Name ({contact.last_name}): ") 
+        contact.address = input(f"Address ({contact.address}): ") 
+        contact.city = input(f"City ({contact.city}): ") 
+        contact.state = input(f"State ({contact.state}): ")
+        contact.zip_code = input(f"Zip Code ({contact.zip_code}): ") 
+        contact.phone_number = input(f"Phone Number ({contact.phone_number}): ") 
+        contact.email = input(f"Email ({contact.email}): ") 
 
     def delete_contact(self, first_name, last_name):
         contact = self.find_contact(first_name, last_name)
@@ -75,18 +75,23 @@ def main():
         choice = input("Choose an option: ")
 
         if choice == "1":
-            print("Enter contact details:")
-            first_name = input("First Name: ")
-            last_name = input("Last Name: ")
-            address = input("Address: ")
-            city = input("City: ")
-            state = input("State: ")
-            zip_code = input("Zip Code: ")
-            phone_number = input("Phone Number: ")
-            email = input("Email: ")
+    
+            while True:
+                print("Enter contact details:")
+                first_name = input("First Name: ")
+                last_name = input("Last Name: ")
+                address = input("Address: ")
+                city = input("City: ")
+                state = input("State: ")
+                zip_code = input("Zip Code: ")
+                phone_number = input("Phone Number: ")
+                email = input("Email: ")
 
-            c = Contact(first_name, last_name, address, city, state, zip_code, phone_number, email)
-            ab.add_contact(c)
+                c = Contact(first_name, last_name, address, city, state, zip_code, phone_number, email)
+                ab.add_contact(c)
+                add_more = input("Do you wish to add another contact ?(yes/no)").strip().lower()
+                if add_more!='yes':
+                    break
 
         elif choice == "2":
             print("Enter the name of the contact to edit:")
@@ -106,7 +111,7 @@ def main():
             print("\nAddress Book:")
             for data in ab.address_book:
                 print(data)
-
+                print("*"*40)
         elif choice == "5":
             break
 
