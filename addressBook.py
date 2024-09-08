@@ -1,13 +1,12 @@
 """
 
 @Author: Suresh
-@Date: 07-09-2024
+@Date: 08-09-2024
 @Last Modified by: Suresh
-@Last Modified Date:07-09-2024
+@Last Modified Date:08-09-2024
 @Title : Addressbook.
 
 """
-
 
 class Contact:
     def __init__(self, first_name, last_name, address, city, state, zip_code, phone_number, email):
@@ -21,7 +20,7 @@ class Contact:
         self.email = email
 
     def __str__(self):
-        return (f"N ame: {self.first_name} {self.last_name}\n"
+        return (f"Name: {self.first_name} {self.last_name}\n"
                 f"Address: {self.address}, {self.city}, {self.state} {self.zip_code}\n"
                 f"Phone: {self.phone_number}\n"
                 f"Email: {self.email}")
@@ -55,14 +54,23 @@ class AddressBook:
         contact.phone_number = input(f"Phone Number ({contact.phone_number}): ") or contact.phone_number
         contact.email = input(f"Email ({contact.email}): ") or contact.email
 
+    def delete_contact(self, first_name, last_name):
+        contact = self.find_contact(first_name, last_name)
+        if contact is None:
+            print("Contact not found.")
+            return
+        self.address_book.remove(contact)
+        print(f"Contact {first_name} {last_name} has been deleted.")
+
 def main():
     ab = AddressBook()
 
     while True:
         print("\n1. Add Contact")
         print("2. Edit Contact")
-        print("3. View Address Book")
-        print("4. Exit")
+        print("3. Delete Contact")
+        print("4. View Address Book")
+        print("5. Exit")
 
         choice = input("Choose an option: ")
 
@@ -88,11 +96,18 @@ def main():
             ab.edit_contact(first_name, last_name)
 
         elif choice == "3":
+            print("Enter the name of the contact to delete:")
+            first_name = input("First Name: ")
+            last_name = input("Last Name: ")
+
+            ab.delete_contact(first_name, last_name)
+
+        elif choice == "4":
             print("\nAddress Book:")
             for data in ab.address_book:
                 print(data)
 
-        elif choice == "4":
+        elif choice == "5":
             break
 
         else:
