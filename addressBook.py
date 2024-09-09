@@ -4,7 +4,7 @@
 @Date: 08-09-2024
 @Last Modified by: Suresh
 @Last Modified Date:08-09-2024
-@Title : Ability to sort the entries in the address book alphabetically by Persons FristName.
+@Title : Ability to sort the entries in the address book by City State, or Zip.
 
 """
 
@@ -78,13 +78,19 @@ class AddressBook:
         self.state_index[contact.state.lower()].remove(contact)
         print(f"Contact {first_name} {last_name} has been deleted.")
 
-    def view_contacts(self, sorted_by_name=False):
+    def view_contacts(self, sorted_by=None):
         if not self.contacts:
             print("No contacts in this address book.")
             return
         
-        if sorted_by_name:
+        if sorted_by == "name":
             sorted_contacts = sorted(self.contacts, key=lambda c: c.full_name().lower())
+        elif sorted_by == "city":
+            sorted_contacts = sorted(self.contacts, key=lambda c: c.city.lower())
+        elif sorted_by == "state":
+            sorted_contacts = sorted(self.contacts, key=lambda c: c.state.lower())
+        elif sorted_by == "zip":
+            sorted_contacts = sorted(self.contacts, key=lambda c: c.zip_code)
         else:
             sorted_contacts = self.contacts
 
@@ -152,7 +158,10 @@ def main():
                 print("3. Delete Contact")
                 print("4. View Address Book")
                 print("5. View Address Book Sorted by Name")
-                print("6. Go Back to Main Menu")
+                print("6. View Address Book Sorted by City")
+                print("7. View Address Book Sorted by State")
+                print("8. View Address Book Sorted by Zip Code")
+                print("9. Go Back to Main Menu")
 
                 sub_choice = input("Choose an option: ")
 
@@ -192,9 +201,21 @@ def main():
 
                 elif sub_choice == "5":
                     print("\nAddress Book Sorted by Name:")
-                    address_book.view_contacts(sorted_by_name=True)
+                    address_book.view_contacts(sorted_by="name")
 
                 elif sub_choice == "6":
+                    print("\nAddress Book Sorted by City:")
+                    address_book.view_contacts(sorted_by="city")
+
+                elif sub_choice == "7":
+                    print("\nAddress Book Sorted by State:")
+                    address_book.view_contacts(sorted_by="state")
+
+                elif sub_choice == "8":
+                    print("\nAddress Book Sorted by Zip Code:")
+                    address_book.view_contacts(sorted_by="zip")
+
+                elif sub_choice == "9":
                     break
                 
                 else:
