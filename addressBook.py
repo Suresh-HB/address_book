@@ -1,11 +1,9 @@
 """
-
 @Author: Suresh
 @Date: 09-09-2024
 @Last Modified by: Suresh
 @Last Modified Date: 09-09-2024
 @Title: Addressbook with Multiple Books and Unique Contacts.
-
 """
 
 class Contact:
@@ -52,11 +50,11 @@ class AddressBook:
             return
 
         print("Editing contact:")
-        contact.first_name = input(f"First Name ({contact.first_name}): ") 
-        contact.last_name = input(f"Last Name ({contact.last_name}): ") 
+        contact.first_name = input(f"First Name ({contact.first_name}): ")
+        contact.last_name = input(f"Last Name ({contact.last_name}): ")
         contact.address = input(f"Address ({contact.address}): ") 
         contact.city = input(f"City ({contact.city}): ") 
-        contact.state = input(f"State ({contact.state}): ")
+        contact.state = input(f"State ({contact.state}): ") 
         contact.zip_code = input(f"Zip Code ({contact.zip_code}): ") 
         contact.phone_number = input(f"Phone Number ({contact.phone_number}): ") 
         contact.email = input(f"Email ({contact.email}): ") 
@@ -76,13 +74,29 @@ class AddressBook:
             print(contact)
             print("*" * 40)
 
+    def search_by_city(self, city):
+        return [contact for contact in self.contacts if contact.city.lower() == city.lower()]
+
+    def search_by_state(self, state):
+        return [contact for contact in self.contacts if contact.state.lower() == state.lower()]
+
+def search_across_address_books(address_books, search_type, search_value):
+    results = []
+    for name, address_book in address_books.items():
+        if search_type == "city":
+            results.extend(address_book.search_by_city(search_value))
+        elif search_type == "state":
+            results.extend(address_book.search_by_state(search_value))
+    return results
+
 def main():
     address_books = {}
 
     while True:
         print("\n1. Create New Address Book")
         print("2. Select Address Book")
-        print("3. Exit")
+        print("3. Search Across Address Books")
+        print("4. Exit")
 
         choice = input("Choose an option: ")
 
@@ -154,6 +168,25 @@ def main():
                     print("Invalid choice. Please choose again.")
 
         elif choice == "3":
+            print("\nSearch Across All Address Books")
+            search_type = input("Search by (city/state): ").strip().lower()
+            search_value = input(f"Enter the {search_type} to search for: ").strip()
+
+            if search_type not in ["city", "state"]:
+                print("Invalid search type. Please choose 'city' or 'state'.")
+                continue
+
+            results = search_across_address_books(address_books, search_type, search_value)
+
+            if not results:
+                print(f"No contacts found in {search_value}.")
+            else:
+                print(f"\nContacts in {search_value}:")
+                for contact in results:
+                    print(contact)
+                    print("*" * 60)
+
+        elif choice == "4":
             break
 
         else:
