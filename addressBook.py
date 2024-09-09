@@ -1,10 +1,13 @@
+
 """
 @Author: Suresh
 @Date: 09-09-2024
 @Last Modified by: Suresh
 @Last Modified Date: 09-09-2024
-@Title: Addressbook with Multiple Books and Unique Contacts.
+@Title: Ability to view Persons by City or State.
 """
+
+from collections import defaultdict
 
 class Contact:
     def __init__(self, first_name, last_name, address, city, state, zip_code, phone_number, email):
@@ -29,12 +32,16 @@ class Contact:
 class AddressBook:
     def __init__(self):
         self.contacts = []
+        self.city_index = defaultdict(list)
+        self.state_index = defaultdict(list)
 
     def add_contact(self, contact):
         if self.find_contact(contact.first_name, contact.last_name):
             print(f"Contact {contact.full_name()} already exists.")
             return
         self.contacts.append(contact)
+        self.city_index[contact.city.lower()].append(contact)
+        self.state_index[contact.state.lower()].append(contact)
         print(f"Contact {contact.full_name()} added.")
 
     def find_contact(self, first_name, last_name):
@@ -65,6 +72,8 @@ class AddressBook:
             print("Contact not found.")
             return
         self.contacts.remove(contact)
+        self.city_index[contact.city.lower()].remove(contact)
+        self.state_index[contact.state.lower()].remove(contact)
         print(f"Contact {first_name} {last_name} has been deleted.")
 
     def view_contacts(self):
@@ -75,10 +84,10 @@ class AddressBook:
             print("*" * 40)
 
     def search_by_city(self, city):
-        return [contact for contact in self.contacts if contact.city.lower() == city.lower()]
+        return self.city_index.get(city.lower(), [])
 
     def search_by_state(self, state):
-        return [contact for contact in self.contacts if contact.state.lower() == state.lower()]
+        return self.state_index.get(state.lower(), [])
 
 def search_across_address_books(address_books, search_type, search_value):
     results = []
@@ -96,7 +105,8 @@ def main():
         print("\n1. Create New Address Book")
         print("2. Select Address Book")
         print("3. Search Across Address Books")
-        print("4. Exit")
+        print("4. View Persons by City or State")
+        print("5. Exit")
 
         choice = input("Choose an option: ")
 
@@ -187,6 +197,25 @@ def main():
                     print("*" * 60)
 
         elif choice == "4":
+            print("\nView Persons by City or State Across All Address Books")
+            view_type = input("View by (city/state): ").strip().lower()
+            view_value = input(f"Enter the {view_type} to view: ").strip()
+
+            if view_type not in ["city", "state"]:
+                print("Invalid view type. Please choose 'city' or 'state'.")
+                continue
+
+            results = search_across_address_books(address_books, view_type, view_value)
+
+            if not results:
+                print(f"No contacts found in {view_value}.")
+            else:
+                print(f"\nContacts in {view_value}:")
+                for contact in results:
+                    print(contact)
+                    print("*" * 60)
+
+        elif choice == "5":
             break
 
         else:
