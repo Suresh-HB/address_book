@@ -1,9 +1,11 @@
 """
+
 @Author: Suresh
 @Date: 09-09-2024
 @Last Modified by: Suresh
 @Last Modified Date: 09-09-2024
-@Title: Addressbook with Multiple Books.
+@Title: Addressbook with Multiple Books and Unique Contacts.
+
 """
 
 class Contact:
@@ -23,12 +25,19 @@ class Contact:
                 f"Phone: {self.phone_number}\n"
                 f"Email: {self.email}")
 
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
 class AddressBook:
     def __init__(self):
         self.contacts = []
 
     def add_contact(self, contact):
+        if self.find_contact(contact.first_name, contact.last_name):
+            print(f"Contact {contact.full_name()} already exists.")
+            return
         self.contacts.append(contact)
+        print(f"Contact {contact.full_name()} added.")
 
     def find_contact(self, first_name, last_name):
         for contact in self.contacts:
@@ -43,14 +52,14 @@ class AddressBook:
             return
 
         print("Editing contact:")
-        contact.first_name = input(f"First Name ({contact.first_name}): ") or contact.first_name
-        contact.last_name = input(f"Last Name ({contact.last_name}): ") or contact.last_name
-        contact.address = input(f"Address ({contact.address}): ") or contact.address
-        contact.city = input(f"City ({contact.city}): ") or contact.city
-        contact.state = input(f"State ({contact.state}): ") or contact.state
-        contact.zip_code = input(f"Zip Code ({contact.zip_code}): ") or contact.zip_code
-        contact.phone_number = input(f"Phone Number ({contact.phone_number}): ") or contact.phone_number
-        contact.email = input(f"Email ({contact.email}): ") or contact.email
+        contact.first_name = input(f"First Name ({contact.first_name}): ") 
+        contact.last_name = input(f"Last Name ({contact.last_name}): ") 
+        contact.address = input(f"Address ({contact.address}): ") 
+        contact.city = input(f"City ({contact.city}): ") 
+        contact.state = input(f"State ({contact.state}): ")
+        contact.zip_code = input(f"Zip Code ({contact.zip_code}): ") 
+        contact.phone_number = input(f"Phone Number ({contact.phone_number}): ") 
+        contact.email = input(f"Email ({contact.email}): ") 
 
     def delete_contact(self, first_name, last_name):
         contact = self.find_contact(first_name, last_name)
