@@ -1,11 +1,13 @@
+"""
+
+@Author: Suresh
+@Date: 08-09-2024
+@Last Modified by: Suresh
+@Last Modified Date:08-09-2024
+@Title : Ability to get number of contact persons count by City or State.
 
 """
-@Author: Suresh
-@Date: 09-09-2024
-@Last Modified by: Suresh
-@Last Modified Date: 09-09-2024
-@Title: Ability to view Persons by City or State.
-"""
+
 
 from collections import defaultdict
 
@@ -98,6 +100,15 @@ def search_across_address_books(address_books, search_type, search_value):
             results.extend(address_book.search_by_state(search_value))
     return results
 
+def count_by_city_or_state(address_books, view_type, view_value):
+    count = 0
+    for address_book in address_books.values():
+        if view_type == "city":
+            count += len(address_book.search_by_city(view_value))
+        elif view_type == "state":
+            count += len(address_book.search_by_state(view_value))
+    return count
+
 def main():
     address_books = {}
 
@@ -188,10 +199,12 @@ def main():
 
             results = search_across_address_books(address_books, search_type, search_value)
 
+            count = count_by_city_or_state(address_books, search_type, search_value)
+
             if not results:
                 print(f"No contacts found in {search_value}.")
             else:
-                print(f"\nContacts in {search_value}:")
+                print(f"\nContacts in {search_value} ({count} found):")
                 for contact in results:
                     print(contact)
                     print("*" * 60)
@@ -207,10 +220,12 @@ def main():
 
             results = search_across_address_books(address_books, view_type, view_value)
 
+            count = count_by_city_or_state(address_books, view_type, view_value)
+
             if not results:
                 print(f"No contacts found in {view_value}.")
             else:
-                print(f"\nContacts in {view_value}:")
+                print(f"\nContacts in {view_value} ({count} found):")
                 for contact in results:
                     print(contact)
                     print("*" * 60)
