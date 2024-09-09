@@ -4,7 +4,7 @@
 @Date: 08-09-2024
 @Last Modified by: Suresh
 @Last Modified Date:08-09-2024
-@Title : Ability to get number of contact persons count by City or State.
+@Title : Ability to sort the entries in the address book alphabetically by Person’s name
 
 """
 
@@ -78,10 +78,17 @@ class AddressBook:
         self.state_index[contact.state.lower()].remove(contact)
         print(f"Contact {first_name} {last_name} has been deleted.")
 
-    def view_contacts(self):
+    def view_contacts(self, sorted_by_name=False):
         if not self.contacts:
             print("No contacts in this address book.")
-        for contact in self.contacts:
+            return
+        
+        if sorted_by_name:
+            sorted_contacts = sorted(self.contacts, key=lambda c: c.full_name().lower())
+        else:
+            sorted_contacts = self.contacts
+
+        for contact in sorted_contacts:
             print(contact)
             print("*" * 40)
 
@@ -144,7 +151,8 @@ def main():
                 print("2. Edit Contact")
                 print("3. Delete Contact")
                 print("4. View Address Book")
-                print("5. Go Back to Main Menu")
+                print("5. View Address Book Sorted by Name")
+                print("6. Go Back to Main Menu")
 
                 sub_choice = input("Choose an option: ")
 
@@ -183,6 +191,10 @@ def main():
                     address_book.view_contacts()
 
                 elif sub_choice == "5":
+                    print("\nAddress Book Sorted by Name:")
+                    address_book.view_contacts(sorted_by_name=True)
+
+                elif sub_choice == "6":
                     break
                 
                 else:
