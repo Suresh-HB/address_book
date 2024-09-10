@@ -1,15 +1,15 @@
 """
 
 @Author: Suresh
-@Date: 10-09-2024
+@Date: 11-09-2024
 @Last Modified by: Suresh
-@Last Modified Date:10-09-2024
-@Title : Ability to sort the entries in the address book by City State, or Zip.
-
+@Last Modified Date:11-09-2024
+@Title : Ability to Read or Write the Address Book with Persons Contact into a File using File IO
 """
 
 
 from collections import defaultdict
+import json
 
 class Contact:
     def __init__(self, first_name, last_name, address, city, state, zip_code, phone_number, email):
@@ -30,6 +30,31 @@ class Contact:
 
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
+
+    def to_dict(self):
+        return {
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "address": self.address,
+            "city": self.city,
+            "state": self.state,
+            "zip_code": self.zip_code,
+            "phone_number": self.phone_number,
+            "email": self.email
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            first_name=data["first_name"],
+            last_name=data["last_name"],
+            address=data["address"],
+            city=data["city"],
+            state=data["state"],
+            zip_code=data["zip_code"],
+            phone_number=data["phone_number"],
+            email=data["email"]
+        )
 
 class AddressBook:
     def __init__(self):
@@ -104,6 +129,31 @@ class AddressBook:
     def search_by_state(self, state):
         return self.state_index.get(state.lower(), [])
 
+    def to_dict(self):
+        return {
+            "contacts": [contact.to_dict() for contact in self.contacts]
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        address_book = cls()
+        address_book.contacts = [Contact.from_dict(contact) for contact in data["contacts"]]
+        for contact in address_book.contacts:
+            address_book.city_index[contact.city.lower()].append(contact)
+            address_book.state_index[contact.state.lower()].append(contact)
+        return address_book
+
+    def save_to_file(self, filename):
+        with open(filename, 'w') as file:
+            json.dump(self.to_dict(), file, indent=4)
+        print(f"Address book saved to {filename}.")
+
+    @classmethod
+    def load_from_file(cls, filename):
+        with open(filename, 'r') as file:
+            data = json.load(file)
+        return cls.from_dict(data)
+
 def search_across_address_books(address_books, search_type, search_value):
     results = []
     for name, address_book in address_books.items():
@@ -130,7 +180,9 @@ def main():
         print("2. Select Address Book")
         print("3. Search Across Address Books")
         print("4. View Persons by City or State")
-        print("5. Exit")
+        print("5. Save Address Book to File")
+        print("6. Load Address Book from File")
+        print("7. Exit")
 
         choice = input("Choose an option: ")
 
@@ -219,55 +271,52 @@ def main():
                     break
                 
                 else:
-                    print("Invalid choice. Please choose again.")
+                    print("Invalid option. Please try again.")
 
         elif choice == "3":
-            print("\nSearch Across All Address Books")
-            search_type = input("Search by (city/state): ").strip().lower()
-            search_value = input(f"Enter the {search_type} to search for: ").strip()
-
-            if search_type not in ["city", "state"]:
-                print("Invalid search type. Please choose 'city' or 'state'.")
-                continue
-
+            search_type = input("Search by city or state? (city/state): ").strip().lower()
+            search_value = input("Enter the value to search: ").strip()
             results = search_across_address_books(address_books, search_type, search_value)
-
-            count = count_by_city_or_state(address_books, search_type, search_value)
-
-            if not results:
-                print(f"No contacts found in {search_value}.")
-            else:
-                print(f"\nContacts in {search_value} ({count} found):")
+            if results:
+                print("\nSearch Results:")
                 for contact in results:
                     print(contact)
-                    print("*" * 60)
+                    print("*" * 40)
+            else:
+                print("No contacts found.")
 
         elif choice == "4":
-            print("\nView Persons by City or State Across All Address Books")
-            view_type = input("View by (city/state): ").strip().lower()
-            view_value = input(f"Enter the {view_type} to view: ").strip()
-
-            if view_type not in ["city", "state"]:
-                print("Invalid view type. Please choose 'city' or 'state'.")
-                continue
-
-            results = search_across_address_books(address_books, view_type, view_value)
-
+            view_type = input("View by city or state? (city/state): ").strip().lower()
+            view_value = input("Enter the value to view: ").strip()
             count = count_by_city_or_state(address_books, view_type, view_value)
-
-            if not results:
-                print(f"No contacts found in {view_value}.")
-            else:
-                print(f"\nContacts in {view_value} ({count} found):")
-                for contact in results:
-                    print(contact)
-                    print("*" * 60)
+            print(f"Total contacts in {view_value}: {count}")
 
         elif choice == "5":
+            name = input("Enter the name of the address book to save: ").strip()
+            address_book = address_books.get(name, None)
+            if address_book:
+                filename = input("Enter the filename to save to: ").strip()
+                address_book.save_to_file(filename)
+            else:
+                print("Address book not found.")
+
+        elif choice == "6":
+            name = input("Enter the name of the address book to load: ").strip()
+            filename = input("Enter the filename to load from: ").strip()
+            try:
+                address_books[name] = AddressBook.load_from_file(filename)
+                print(f"Address book '{name}' loaded from {filename}.")
+            except FileNotFoundError:
+                print("File not found.")
+            except json.JSONDecodeError:
+                print("Error decoding JSON from file.")
+
+        elif choice == "7":
+            print("Exiting program.")
             break
 
         else:
-            print("Invalid choice. Please choose again.")
+            print("Invalid option. Please try again.")
 
 if __name__ == "__main__":
     main()
