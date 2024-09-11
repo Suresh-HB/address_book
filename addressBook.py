@@ -4,13 +4,14 @@
 @Date: 11-09-2024
 @Last Modified by: Suresh
 @Last Modified Date:11-09-2024
-@Title : Ability to Read/Write the Address Book with Persons Contact as CSV File.
+@Title : Ability to Read or Write the Address Book with Persons Contact as JSON File.
 
 """
 
 import csv
 import json
 from collections import defaultdict
+
 class Contact:
     def __init__(self, first_name, last_name, address, city, state, zip_code, phone_number, email):
         self.first_name = first_name
@@ -84,14 +85,14 @@ class AddressBook:
             return
 
         print("Editing contact:")
-        contact.first_name = input(f"First Name ({contact.first_name}): ")
-        contact.last_name = input(f"Last Name ({contact.last_name}): ")
-        contact.address = input(f"Address ({contact.address}): ")
-        contact.city = input(f"City ({contact.city}): ")
-        contact.state = input(f"State ({contact.state}): ")
-        contact.zip_code = input(f"Zip Code ({contact.zip_code}): ")
-        contact.phone_number = input(f"Phone Number ({contact.phone_number}): ")
-        contact.email = input(f"Email ({contact.email}): ")
+        contact.first_name = input(f"First Name ({contact.first_name}): ") or contact.first_name
+        contact.last_name = input(f"Last Name ({contact.last_name}): ") or contact.last_name
+        contact.address = input(f"Address ({contact.address}): ") or contact.address
+        contact.city = input(f"City ({contact.city}): ") or contact.city
+        contact.state = input(f"State ({contact.state}): ") or contact.state
+        contact.zip_code = input(f"Zip Code ({contact.zip_code}): ") or contact.zip_code
+        contact.phone_number = input(f"Phone Number ({contact.phone_number}): ") or contact.phone_number
+        contact.email = input(f"Email ({contact.email}): ") or contact.email
 
     def delete_contact(self, first_name, last_name):
         contact = self.find_contact(first_name, last_name)
@@ -151,7 +152,8 @@ class AddressBook:
     def load_from_file(self, filename):
         with open(filename, 'r') as file:
             data = json.load(file)
-        return self.from_dict(data)
+        address_book = self.from_dict(data)
+        return address_book
 
     def save_to_csv(self, filename):
         with open(filename, 'w', newline='') as file:
@@ -198,8 +200,8 @@ def main():
         print("2. Select Address Book")
         print("3. Search Across Address Books")
         print("4. View Persons by City or State")
-        print("5. Save Address Book to File")
-        print("6. Load Address Book from File")
+        print("5. Save Address Book to JSON File")
+        print("6. Load Address Book from JSON File")
         print("7. Save Address Book to CSV File")
         print("8. Load Address Book from CSV File")
         print("9. Exit")
@@ -210,7 +212,6 @@ def main():
             name = input("Enter the name for the new address book: ").strip()
             if name in address_books:
                 print(f"Address book '{name}' already exists")
-                print("            -----------")
             else:
                 address_books[name] = AddressBook()
                 print(f"Address book '{name}' created.")
