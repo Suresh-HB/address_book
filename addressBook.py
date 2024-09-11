@@ -4,13 +4,13 @@
 @Date: 11-09-2024
 @Last Modified by: Suresh
 @Last Modified Date:11-09-2024
-@Title : Ability to Read or Write the Address Book with Persons Contact into a File using File IO
+@Title : Ability to Read/Write the Address Book with Persons Contact as CSV File.
+
 """
 
-
-from collections import defaultdict
+import csv
 import json
-
+from collections import defaultdict
 class Contact:
     def __init__(self, first_name, last_name, address, city, state, zip_code, phone_number, email):
         self.first_name = first_name
@@ -86,12 +86,12 @@ class AddressBook:
         print("Editing contact:")
         contact.first_name = input(f"First Name ({contact.first_name}): ")
         contact.last_name = input(f"Last Name ({contact.last_name}): ")
-        contact.address = input(f"Address ({contact.address}): ") 
-        contact.city = input(f"City ({contact.city}): ") 
-        contact.state = input(f"State ({contact.state}): ") 
-        contact.zip_code = input(f"Zip Code ({contact.zip_code}): ") 
-        contact.phone_number = input(f"Phone Number ({contact.phone_number}): ") 
-        contact.email = input(f"Email ({contact.email}): ") 
+        contact.address = input(f"Address ({contact.address}): ")
+        contact.city = input(f"City ({contact.city}): ")
+        contact.state = input(f"State ({contact.state}): ")
+        contact.zip_code = input(f"Zip Code ({contact.zip_code}): ")
+        contact.phone_number = input(f"Phone Number ({contact.phone_number}): ")
+        contact.email = input(f"Email ({contact.email}): ")
 
     def delete_contact(self, first_name, last_name):
         contact = self.find_contact(first_name, last_name)
@@ -148,11 +148,29 @@ class AddressBook:
             json.dump(self.to_dict(), file, indent=4)
         print(f"Address book saved to {filename}.")
 
-    @classmethod
-    def load_from_file(cls, filename):
+    def load_from_file(self, filename):
         with open(filename, 'r') as file:
             data = json.load(file)
-        return cls.from_dict(data)
+        return self.from_dict(data)
+
+    def save_to_csv(self, filename):
+        with open(filename, 'w', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=[
+                "first_name", "last_name", "address", "city", "state", "zip_code", "phone_number", "email"])
+            writer.writeheader()
+            for contact in self.contacts:
+                writer.writerow(contact.to_dict())
+        print(f"Address book saved to CSV file {filename}.")
+
+    @classmethod
+    def load_from_csv(cls, filename):
+        address_book = cls()
+        with open(filename, 'r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                contact = Contact.from_dict(row)
+                address_book.add_contact(contact)
+        return address_book
 
 def search_across_address_books(address_books, search_type, search_value):
     results = []
@@ -182,7 +200,9 @@ def main():
         print("4. View Persons by City or State")
         print("5. Save Address Book to File")
         print("6. Load Address Book from File")
-        print("7. Exit")
+        print("7. Save Address Book to CSV File")
+        print("8. Load Address Book from CSV File")
+        print("9. Exit")
 
         choice = input("Choose an option: ")
 
@@ -295,16 +315,16 @@ def main():
             name = input("Enter the name of the address book to save: ").strip()
             address_book = address_books.get(name, None)
             if address_book:
-                filename = input("Enter the filename to save to: ").strip()
+                filename = input("Enter the filename to save to (JSON): ").strip()
                 address_book.save_to_file(filename)
             else:
                 print("Address book not found.")
 
         elif choice == "6":
             name = input("Enter the name of the address book to load: ").strip()
-            filename = input("Enter the filename to load from: ").strip()
+            filename = input("Enter the filename to load from (JSON): ").strip()
             try:
-                address_books[name] = AddressBook.load_from_file(filename)
+                address_books[name] = AddressBook().load_from_file(filename)
                 print(f"Address book '{name}' loaded from {filename}.")
             except FileNotFoundError:
                 print("File not found.")
@@ -312,6 +332,26 @@ def main():
                 print("Error decoding JSON from file.")
 
         elif choice == "7":
+            name = input("Enter the name of the address book to save: ").strip()
+            address_book = address_books.get(name, None)
+            if address_book:
+                filename = input("Enter the filename to save to (CSV): ").strip()
+                address_book.save_to_csv(filename)
+            else:
+                print("Address book not found.")
+
+        elif choice == "8":
+            name = input("Enter the name of the address book to load: ").strip()
+            filename = input("Enter the filename to load from (CSV): ").strip()
+            try:
+                address_books[name] = AddressBook.load_from_csv(filename)
+                print(f"Address book '{name}' loaded from {filename}.")
+            except FileNotFoundError:
+                print("File not found.")
+            except csv.Error:
+                print("Error reading CSV file.")
+
+        elif choice == "9":
             print("Exiting program.")
             break
 
